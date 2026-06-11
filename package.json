@@ -1,0 +1,26 @@
+{
+  "name": "savannah-bbq-growth-engine",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Savannah BBQ Growth Engine enterprise monorepo",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace backend\" \"npm run dev --workspace frontend\"",
+    "build": "npm run build --workspace frontend",
+    "start": "npm run start --workspace backend",
+    "seed:admin": "npm run seed:admin --workspace backend",
+    "test": "npm run test --workspace backend",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "^3.6.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

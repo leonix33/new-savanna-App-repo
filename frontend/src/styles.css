@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply min-h-screen bg-pit text-orange-50 antialiased;
+  background:
+    radial-gradient(circle at top left, rgba(249, 115, 22, 0.18), transparent 34rem),
+    radial-gradient(circle at 85% 10%, rgba(251, 146, 60, 0.12), transparent 28rem),
+    linear-gradient(135deg, #110b07 0%, #1a100b 45%, #0c0806 100%);
+}
+
+::selection {
+  @apply bg-orange-400 text-pit;
+}
+
+.card {
+  @apply rounded-3xl border border-orange-800/30 bg-smoke/80 p-5 shadow-xl shadow-black/20 backdrop-blur;
+}
+
+.panel {
+  @apply rounded-3xl border border-orange-900/40 bg-black/25 p-4;
+}
+
+.page-kicker {
+  @apply text-xs font-black uppercase tracking-[0.34em] text-orange-300;
+}
+
+.page-title {
+  @apply mt-2 text-3xl font-black tracking-tight text-orange-50 md:text-4xl;
+}
+
+.page-copy {
+  @apply mt-2 max-w-3xl text-sm leading-6 text-orange-100/70 md:text-base;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-2xl bg-ember px-4 py-2.5 text-sm font-bold text-white transition hover:bg-sauce focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 focus:ring-offset-pit disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center rounded-2xl border border-orange-700/50 bg-orange-950/20 px-4 py-2.5 text-sm font-bold text-orange-100 transition hover:border-orange-500/70 hover:bg-orange-900/30 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 focus:ring-offset-pit disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.input {
+  @apply w-full rounded-2xl border border-orange-900/60 bg-black/25 px-3.5 py-2.5 text-orange-50 outline-none transition placeholder:text-orange-200/35 focus:border-ember focus:bg-black/35 focus:ring-2 focus:ring-orange-500/20;
+}
+
+.label {
+  @apply mb-1.5 block text-sm font-bold text-orange-200;
+}
+
+.stat-card {
+  @apply rounded-3xl border border-orange-800/30 bg-black/25 p-5;
+}
+
+.badge {
+  @apply inline-flex items-center rounded-full border border-orange-800/40 bg-orange-950/50 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-orange-200;
+}
+
+.surface-list {
+  @apply rounded-2xl border border-orange-900/40 bg-black/25 p-4;
+}
+
+.empty-state {
+  @apply rounded-2xl border border-dashed border-orange-800/50 bg-black/20 p-6 text-sm text-orange-100/60;
+}

@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: savannah-bbq-growth-engine
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_TEXT_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_VISION_MODEL
+        value: gpt-4o-mini
+      - key: AUTO_PUBLISH_MODE
+        value: "false"
+      - key: LIVE_FACEBOOK_MODE
+        value: "false"
+      - key: LIVE_SOCIAL_PUBLISHING
+        value: "false"
