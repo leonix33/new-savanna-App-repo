@@ -16,7 +16,7 @@ onMounted(async () => {
       <div class="grid gap-6 p-6 lg:grid-cols-[1fr_320px] lg:p-8">
         <div>
           <p class="page-kicker">Enterprise rebuild</p>
-          <h1 class="page-title">savanna bbq growth</h1>
+          <h1 class="page-title">savannah-bbq</h1>
           <p class="page-copy">
             Generate campaigns, manage the content queue, review comments, and simulate publishing from one service.
           </p>
