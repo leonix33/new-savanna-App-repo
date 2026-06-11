@@ -3,6 +3,9 @@ import { onMounted, reactive, ref } from 'vue';
 import { http } from '../api/http.js';
 
 const users = ref([]);
+const error = ref('');
+const success = ref('');
+const saving = ref(false);
 const form = reactive({
   name: '',
   email: '',
@@ -16,9 +19,20 @@ async function load() {
 }
 
 async function add() {
-  await http.post('/users', form);
-  Object.assign(form, { name: '', email: '', password: '', role: 'viewer' });
-  await load();
+  error.value = '';
+  success.value = '';
+  saving.value = true;
+  try {
+    const { data } = await http.post('/users', form);
+    Object.assign(form, { name: '', email: '', password: '', role: 'viewer' });
+    success.value = `${data.user.name} was created.`;
+    await load();
+  } catch (err) {
+    error.value =
+      err.response?.data?.details?.[0]?.message || err.response?.data?.message || 'Unable to create user.';
+  } finally {
+    saving.value = false;
+  }
 }
 
 async function update(user, patch) {
@@ -37,9 +51,20 @@ onMounted(load);
       <p class="page-copy">Create operators, assign roles, and disable accounts without leaving the admin workspace.</p>
     </div>
     <form class="card grid gap-4 md:grid-cols-4" @submit.prevent="add">
-      <label><span class="label">Name</span><input v-model="form.name" class="input" placeholder="Name" /></label>
-      <label><span class="label">Email</span><input v-model="form.email" class="input" placeholder="Email" /></label>
-      <label><span class="label">Password</span><input v-model="form.password" class="input" placeholder="Password" type="password" /></label>
+      <label><span class="label">Name</span><input v-model="form.name" class="input" minlength="2" placeholder="Name" required /></label>
+      <label><span class="label">Email</span><input v-model="form.email" class="input" placeholder="Email" required type="email" /></label>
+      <label>
+        <span class="label">Password</span>
+        <input
+          v-model="form.password"
+          autocomplete="new-password"
+          class="input"
+          minlength="8"
+          placeholder="At least 8 characters"
+          required
+          type="password"
+        />
+      </label>
       <label>
         <span class="label">Role</span>
         <select v-model="form.role" class="input">
@@ -48,7 +73,16 @@ onMounted(load);
           <option>admin</option>
         </select>
       </label>
-      <button class="btn md:col-span-4">Create user</button>
+      <p v-if="error" class="rounded-2xl border border-red-400/30 bg-red-950/30 px-4 py-3 text-sm text-red-200 md:col-span-4">
+        {{ error }}
+      </p>
+      <p
+        v-if="success"
+        class="rounded-2xl border border-emerald-400/30 bg-emerald-950/30 px-4 py-3 text-sm text-emerald-100 md:col-span-4"
+      >
+        {{ success }}
+      </p>
+      <button class="btn md:col-span-4" :disabled="saving">{{ saving ? 'Creating user...' : 'Create user' }}</button>
     </form>
     <div class="card overflow-x-auto">
       <table class="w-full text-left text-sm">
