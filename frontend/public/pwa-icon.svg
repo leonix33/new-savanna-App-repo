@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Savannah BBQ</title>
+  <desc id="desc">Savannah BBQ app icon with warm barbecue colors.</desc>
+  <rect width="512" height="512" rx="112" fill="#1c0f0a"/>
+  <circle cx="256" cy="256" r="174" fill="#f97316"/>
+  <circle cx="256" cy="256" r="132" fill="#7c2d12"/>
+  <path
+    d="M152 294c0-26 17-48 43-58-7-10-11-21-11-34 0-39 32-71 72-71s72 32 72 71c0 13-4 24-11 34 26 10 43 32 43 58 0 49-46 87-104 87s-104-38-104-87Z"
+    fill="#fff7ed"
+  />
+  <path
+    d="M210 225c-6-10-9-20-9-31 0-31 25-56 55-56s55 25 55 56c0 11-3 21-9 31-13-6-29-9-46-9s-33 3-46 9Z"
+    fill="#fed7aa"
+  />
+  <path d="M176 306h160c-9 29-41 50-80 50s-71-21-80-50Z" fill="#431407"/>
+  <path d="M203 296c10-18 29-30 53-30s43 12 53 30H203Z" fill="#fb923c"/>
+  <path d="M170 126c48-42 124-54 185-22" fill="none" stroke="#ffedd5" stroke-width="26" stroke-linecap="round"/>
+</svg>

@@ -1,11 +1,13 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from './stores/auth.js';
 
 const auth = useAuthStore();
 const route = useRoute();
 const router = useRouter();
+const updateAvailable = ref(false);
+const applyAppUpdate = ref(null);
 
 const nav = computed(() => [
   ['/', 'Dashboard', true],
@@ -33,6 +35,23 @@ async function logout() {
   await auth.logout();
   router.push('/login');
 }
+
+function handlePwaUpdate(event) {
+  updateAvailable.value = true;
+  applyAppUpdate.value = event.detail.updateSW;
+}
+
+function reloadForUpdate() {
+  applyAppUpdate.value?.(true);
+}
+
+onMounted(() => {
+  window.addEventListener('pwa-update-available', handlePwaUpdate);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('pwa-update-available', handlePwaUpdate);
+});
 </script>
 
 <template>
@@ -99,5 +118,18 @@ async function logout() {
     <main :class="!isLoginRoute ? 'lg:ml-72' : ''" class="min-h-screen p-4 sm:p-6 lg:p-8">
       <RouterView />
     </main>
+
+    <div
+      v-if="updateAvailable"
+      class="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-xl rounded-3xl border border-orange-700/50 bg-pit/95 p-4 shadow-2xl shadow-black/40 backdrop-blur"
+    >
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm font-black text-orange-50">Update ready</p>
+          <p class="mt-1 text-sm text-orange-100/70">A fresh version of Savannah BBQ is ready to install.</p>
+        </div>
+        <button class="btn shrink-0" @click="reloadForUpdate">Update now</button>
+      </div>
+    </div>
   </div>
 </template>
