@@ -91,11 +91,11 @@ Required Render environment variables:
 - `OPENAI_API_KEY` (optional for demo generation, required for live AI output)
 - `OPENAI_TEXT_MODEL`
 - `OPENAI_VISION_MODEL`
-- `META_APP_ID` (required for Meta app tracking/configuration)
-- `META_APP_SECRET` (required for Meta app tracking/configuration)
-- `META_PAGE_ID` (required for Facebook Page publishing)
-- `META_PAGE_ACCESS_TOKEN` (required for Facebook Page publishing)
-- `META_GRAPH_VERSION` (defaults to `v20.0`)
+- `FACEBOOK_APP_ID` (optional app tracking/configuration)
+- `FACEBOOK_APP_SECRET` (optional app tracking/configuration)
+- `FACEBOOK_PAGE_ID` (required for Facebook comment import and Page publishing)
+- `FACEBOOK_PAGE_ACCESS_TOKEN` (required for Facebook comment import and Page publishing)
+- `FACEBOOK_GRAPH_VERSION` (defaults to `v20.0`)
 - `FACEBOOK_PUBLISH_ENABLED` (must be `true` before any real Facebook publish)
 
 Safety flags should stay false until real social writes are implemented:
@@ -111,22 +111,26 @@ FACEBOOK_PUBLISH_ENABLED=false
 
 Facebook Page feed publishing is implemented behind an explicit safety flag. By default, the app keeps the existing simulation behavior and does not publish to Facebook.
 
-Required Meta variables:
+Required Facebook variables:
 
 ```bash
-META_APP_ID=your_meta_app_id
-META_APP_SECRET=your_meta_app_secret
-META_PAGE_ID=your_facebook_page_id
-META_PAGE_ACCESS_TOKEN=your_page_access_token
-META_GRAPH_VERSION=v20.0
+FACEBOOK_APP_ID=your_facebook_app_id
+FACEBOOK_APP_SECRET=your_facebook_app_secret
+FACEBOOK_PAGE_ID=your_facebook_page_id
+FACEBOOK_PAGE_ACCESS_TOKEN=your_page_access_token
+FACEBOOK_GRAPH_VERSION=v20.0
 FACEBOOK_PUBLISH_ENABLED=false
 ```
+
+The backend also supports `META_APP_ID`, `META_APP_SECRET`, `META_PAGE_ID`, `META_PAGE_ACCESS_TOKEN`, and `META_GRAPH_VERSION` as backwards-compatible aliases, but `FACEBOOK_*` values are preferred when both are set.
+
+Never commit real Facebook access tokens or app secrets. Store production values only in Render environment variables or local untracked `.env` files.
 
 Render setup:
 
 1. Open the Render service.
 2. Go to **Environment**.
-3. Add the Meta variables above.
+3. Add the Facebook variables above.
 4. Keep `FACEBOOK_PUBLISH_ENABLED=false` while testing simulation mode.
 5. Save changes and redeploy.
 
@@ -139,15 +143,15 @@ POST /api/integrations/facebook/test-post
 Only admins can call this endpoint. When `FACEBOOK_PUBLISH_ENABLED=false`, it returns a simulated response and does not call Meta. When `FACEBOOK_PUBLISH_ENABLED=true`, it posts the provided text to:
 
 ```text
-POST /{META_PAGE_ID}/feed
+POST /{FACEBOOK_PAGE_ID}/feed
 ```
 
-with the configured Page Access Token. Access tokens are never logged.
+The app resolves that Page id from `FACEBOOK_PAGE_ID` first, then `META_PAGE_ID` as a fallback. Access tokens are never logged.
 
 To test safely:
 
 1. First test with `FACEBOOK_PUBLISH_ENABLED=false` and confirm the simulated response.
-2. Confirm `META_PAGE_ID` points to the correct Page.
+2. Confirm `FACEBOOK_PAGE_ID` points to the correct Page.
 3. Confirm the Page Access Token has permission to publish Page content.
 4. Set `FACEBOOK_PUBLISH_ENABLED=true`.
 5. Call the admin test endpoint with a harmless test message.

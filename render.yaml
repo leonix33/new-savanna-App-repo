@@ -23,15 +23,15 @@ services:
         value: gpt-4o-mini
       - key: OPENAI_VISION_MODEL
         value: gpt-4o-mini
-      - key: META_APP_ID
+      - key: FACEBOOK_APP_ID
         sync: false
-      - key: META_APP_SECRET
+      - key: FACEBOOK_APP_SECRET
         sync: false
-      - key: META_PAGE_ID
+      - key: FACEBOOK_PAGE_ID
         sync: false
-      - key: META_PAGE_ACCESS_TOKEN
+      - key: FACEBOOK_PAGE_ACCESS_TOKEN
         sync: false
-      - key: META_GRAPH_VERSION
+      - key: FACEBOOK_GRAPH_VERSION
         value: v20.0
       - key: FACEBOOK_PUBLISH_ENABLED
         value: "false"

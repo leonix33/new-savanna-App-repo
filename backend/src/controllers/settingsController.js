@@ -1,7 +1,10 @@
 import { env, isConfigured } from '../config/env.js';
+import { getFacebookPublishConfig, isFacebookPublishConfigured } from '../services/facebookService.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 export const getSocialSetup = asyncHandler(async (_req, res) => {
+  const facebookPublishConfig = getFacebookPublishConfig();
+
   res.json({
     facebook: {
       pageConfigured: isConfigured(env.FACEBOOK_PAGE_ID),
@@ -11,16 +14,16 @@ export const getSocialSetup = asyncHandler(async (_req, res) => {
         isConfigured(env.FACEBOOK_PAGE_ID) && isConfigured(env.FACEBOOK_PAGE_ACCESS_TOKEN)
     },
     metaPublishing: {
-      appConfigured: isConfigured(env.META_APP_ID),
-      appSecretConfigured: isConfigured(env.META_APP_SECRET),
-      pageConfigured: isConfigured(env.META_PAGE_ID),
-      tokenConfigured: isConfigured(env.META_PAGE_ACCESS_TOKEN),
-      graphVersion: env.META_GRAPH_VERSION,
+      appConfigured: isConfigured(facebookPublishConfig.appId),
+      appSecretConfigured: isConfigured(facebookPublishConfig.appSecret),
+      pageConfigured: isConfigured(facebookPublishConfig.pageId),
+      tokenConfigured: isConfigured(facebookPublishConfig.pageAccessToken),
+      graphVersion: facebookPublishConfig.graphVersion,
       publishEnabled: env.FACEBOOK_PUBLISH_ENABLED,
-      publishAvailable:
-        env.FACEBOOK_PUBLISH_ENABLED &&
-        isConfigured(env.META_PAGE_ID) &&
-        isConfigured(env.META_PAGE_ACCESS_TOKEN)
+      publishAvailable: env.FACEBOOK_PUBLISH_ENABLED && isFacebookPublishConfigured(),
+      preferredEnvPrefix: 'FACEBOOK',
+      metaAliasConfigured:
+        isConfigured(env.META_PAGE_ID) || isConfigured(env.META_PAGE_ACCESS_TOKEN)
     },
     instagram: { businessIdConfigured: isConfigured(env.INSTAGRAM_BUSINESS_ID) },
     tiktok: { businessIdConfigured: isConfigured(env.TIKTOK_BUSINESS_ID) },
