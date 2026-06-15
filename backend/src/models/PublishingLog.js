@@ -6,6 +6,7 @@ const publishingLogSchema = new mongoose.Schema(
     platform: { type: String, required: true },
     status: { type: String, required: true },
     message: String,
+    facebookPostId: String,
     errorMessage: String,
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
   },

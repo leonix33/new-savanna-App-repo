@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import { PublishingLog } from '../models/PublishingLog.js';
 import { QueueItem } from '../models/QueueItem.js';
+import { isFacebookPublishEnabled, publishQueueItemToFacebook } from './facebookService.js';
 
 export function isDue(item, now = DateTime.utc()) {
   if (item.status !== 'scheduled' || !item.scheduledDate || !item.scheduledTime) return false;
@@ -28,6 +29,35 @@ export async function simulatePublish(item, userId) {
   return { item, log };
 }
 
+function isFacebookQueueItem(item) {
+  return item.platform?.toLowerCase() === 'facebook';
+}
+
+export async function publishQueueItem(item, userId) {
+  if (!isFacebookPublishEnabled() || !isFacebookQueueItem(item)) {
+    return simulatePublish(item, userId);
+  }
+
+  item.status = 'publishing';
+  await item.save();
+
+  const result = await publishQueueItemToFacebook(item);
+
+  item.status = 'posted';
+  await item.save();
+
+  const log = await PublishingLog.create({
+    queueItem: item.id,
+    platform: item.platform,
+    status: 'posted',
+    message: 'Published to Facebook Page.',
+    facebookPostId: result.facebookPostId,
+    createdBy: userId
+  });
+
+  return { item, log, facebook: result };
+}
+
 export async function runScheduler({ userId } = {}) {
   const candidates = await QueueItem.find({ status: 'scheduled' }).limit(200);
   const due = candidates.filter((item) => isDue(item));
@@ -35,7 +65,7 @@ export async function runScheduler({ userId } = {}) {
 
   for (const item of due) {
     try {
-      results.push(await simulatePublish(item, userId));
+      results.push(await publishQueueItem(item, userId));
     } catch (error) {
       item.status = 'failed';
       await item.save();
@@ -43,7 +73,7 @@ export async function runScheduler({ userId } = {}) {
         queueItem: item.id,
         platform: item.platform,
         status: 'failed',
-        message: 'Scheduler simulation failed',
+        message: isFacebookQueueItem(item) ? 'Facebook publish failed' : 'Scheduler simulation failed',
         errorMessage: error.message,
         createdBy: userId
       });

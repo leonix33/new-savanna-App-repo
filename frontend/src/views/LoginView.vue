@@ -5,7 +5,7 @@ import { useAuthStore } from '../stores/auth.js';
 
 const auth = useAuthStore();
 const router = useRouter();
-const form = reactive({ email: 'admin@savannahbbq.local', password: 'ChangeMe123!' });
+const form = reactive({ email: '', password: '' });
 const error = ref('');
 const showLocalDevLogin = import.meta.env.DEV;
 
@@ -64,11 +64,18 @@ async function loginForLocalDev() {
       </div>
       <label>
         <span class="label">Email</span>
-        <input v-model="form.email" autocomplete="email" class="input" type="email" />
+        <input v-model="form.email" autocomplete="email" class="input" placeholder="you@example.com" required type="email" />
       </label>
       <label>
         <span class="label">Password</span>
-        <input v-model="form.password" autocomplete="current-password" class="input" type="password" />
+        <input
+          v-model="form.password"
+          autocomplete="current-password"
+          class="input"
+          placeholder="Enter your password"
+          required
+          type="password"
+        />
       </label>
       <p v-if="error" class="rounded-2xl border border-red-400/30 bg-red-950/30 px-4 py-3 text-sm text-red-200">
         {{ error }}
@@ -83,7 +90,7 @@ async function loginForLocalDev() {
       >
         Local dev login
       </button>
-      <p class="rounded-2xl bg-black/20 px-4 py-3 text-xs leading-5 text-orange-200/70">
+      <p v-if="showLocalDevLogin" class="rounded-2xl bg-black/20 px-4 py-3 text-xs leading-5 text-orange-200/70">
         Seed the first admin with <code>npm run seed:admin</code>.
       </p>
     </form>

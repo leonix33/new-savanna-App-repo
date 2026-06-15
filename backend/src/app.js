@@ -15,6 +15,7 @@ import { analyticsRoutes } from './routes/analyticsRoutes.js';
 import { authRoutes } from './routes/authRoutes.js';
 import { commentRoutes } from './routes/commentRoutes.js';
 import { generationRoutes } from './routes/generationRoutes.js';
+import { integrationRoutes } from './routes/integrationRoutes.js';
 import { logRoutes } from './routes/logRoutes.js';
 import { queueRoutes } from './routes/queueRoutes.js';
 import { schedulerRoutes } from './routes/schedulerRoutes.js';
@@ -49,6 +50,7 @@ export function createApp() {
   app.use('/api/generations', generationRoutes);
   app.use('/api/queue', queueRoutes);
   app.use('/api/comments', commentRoutes);
+  app.use('/api/integrations', integrationRoutes);
   app.use('/api/logs', logRoutes);
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/scheduler', schedulerRoutes);

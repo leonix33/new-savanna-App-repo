@@ -91,6 +91,12 @@ Required Render environment variables:
 - `OPENAI_API_KEY` (optional for demo generation, required for live AI output)
 - `OPENAI_TEXT_MODEL`
 - `OPENAI_VISION_MODEL`
+- `META_APP_ID` (required for Meta app tracking/configuration)
+- `META_APP_SECRET` (required for Meta app tracking/configuration)
+- `META_PAGE_ID` (required for Facebook Page publishing)
+- `META_PAGE_ACCESS_TOKEN` (required for Facebook Page publishing)
+- `META_GRAPH_VERSION` (defaults to `v20.0`)
+- `FACEBOOK_PUBLISH_ENABLED` (must be `true` before any real Facebook publish)
 
 Safety flags should stay false until real social writes are implemented:
 
@@ -98,7 +104,61 @@ Safety flags should stay false until real social writes are implemented:
 AUTO_PUBLISH_MODE=false
 LIVE_FACEBOOK_MODE=false
 LIVE_SOCIAL_PUBLISHING=false
+FACEBOOK_PUBLISH_ENABLED=false
 ```
+
+## Facebook Page Publishing
+
+Facebook Page feed publishing is implemented behind an explicit safety flag. By default, the app keeps the existing simulation behavior and does not publish to Facebook.
+
+Required Meta variables:
+
+```bash
+META_APP_ID=your_meta_app_id
+META_APP_SECRET=your_meta_app_secret
+META_PAGE_ID=your_facebook_page_id
+META_PAGE_ACCESS_TOKEN=your_page_access_token
+META_GRAPH_VERSION=v20.0
+FACEBOOK_PUBLISH_ENABLED=false
+```
+
+Render setup:
+
+1. Open the Render service.
+2. Go to **Environment**.
+3. Add the Meta variables above.
+4. Keep `FACEBOOK_PUBLISH_ENABLED=false` while testing simulation mode.
+5. Save changes and redeploy.
+
+Safe test endpoint:
+
+```bash
+POST /api/integrations/facebook/test-post
+```
+
+Only admins can call this endpoint. When `FACEBOOK_PUBLISH_ENABLED=false`, it returns a simulated response and does not call Meta. When `FACEBOOK_PUBLISH_ENABLED=true`, it posts the provided text to:
+
+```text
+POST /{META_PAGE_ID}/feed
+```
+
+with the configured Page Access Token. Access tokens are never logged.
+
+To test safely:
+
+1. First test with `FACEBOOK_PUBLISH_ENABLED=false` and confirm the simulated response.
+2. Confirm `META_PAGE_ID` points to the correct Page.
+3. Confirm the Page Access Token has permission to publish Page content.
+4. Set `FACEBOOK_PUBLISH_ENABLED=true`.
+5. Call the admin test endpoint with a harmless test message.
+6. Set `FACEBOOK_PUBLISH_ENABLED=false` again if you want to disable real posting.
+
+Scheduler behavior:
+
+- Due queue items continue to simulate publishing by default.
+- When `FACEBOOK_PUBLISH_ENABLED=true`, due queue items with platform `Facebook` are published to the configured Page.
+- Successful live publishes save the returned Facebook post id on the publishing log.
+- Failed live publishes mark the queue item as `failed` and save the error message.
 
 ## Features
 
@@ -120,4 +180,4 @@ npm run build
 
 ## Notes
 
-The app intentionally keeps social publishing simulate-only. Real Facebook/Instagram/TikTok writes and live comment replies should be added in a separate reviewed change behind the existing safety flags.
+Facebook Page feed publishing exists behind `FACEBOOK_PUBLISH_ENABLED`. Instagram/TikTok writes and live comment replies remain disabled until implemented and reviewed separately.
