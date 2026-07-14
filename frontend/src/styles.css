@@ -65,3 +65,76 @@ body {
 .empty-state {
   @apply rounded-2xl border border-dashed border-orange-800/50 bg-black/20 p-6 text-sm text-orange-100/60;
 }
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.mobile-main {
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 1024px) {
+  .mobile-main {
+    padding-bottom: 2rem;
+  }
+}
+
+.mobile-tab-bar {
+  padding-left: max(0.25rem, env(safe-area-inset-left, 0px));
+  padding-right: max(0.25rem, env(safe-area-inset-right, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.mobile-tab {
+  min-width: 0;
+  min-height: 44px;
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+.mobile-tab-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.mobile-tab-label {
+  font-size: 0.6875rem;
+  line-height: 1.1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toast-host {
+  @apply fixed inset-x-4 top-4 z-[60] mx-auto flex max-w-xl flex-col gap-2;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.toast-item {
+  @apply flex items-start justify-between gap-3 rounded-2xl border px-4 py-3 shadow-xl shadow-black/30 backdrop-blur;
+}
+
+.toast-dismiss {
+  @apply shrink-0 text-lg leading-none text-orange-100/70 transition hover:text-orange-50;
+}
+
+.confirm-overlay,
+.more-menu-overlay {
+  @apply fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center;
+}
+
+.confirm-dialog,
+.more-menu-panel {
+  @apply w-full max-w-md;
+}
+
+.more-menu-panel {
+  max-height: min(80vh, 32rem);
+  overflow-y: auto;
+}

@@ -1,13 +1,17 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import MobileMoreMenu from './components/MobileMoreMenu.vue';
+import ToastHost from './components/ToastHost.vue';
 import { useAuthStore } from './stores/auth.js';
+import { mobileNav, moreNavSections } from './utils/navigation.js';
 
 const auth = useAuthStore();
 const route = useRoute();
 const router = useRouter();
 const updateAvailable = ref(false);
 const applyAppUpdate = ref(null);
+const showMoreMenu = ref(false);
 
 const nav = computed(() => [
   ['/', 'Dashboard', true],
@@ -21,6 +25,12 @@ const nav = computed(() => [
   ['/users', 'Users', auth.isAdmin]
 ]);
 const visibleNav = computed(() => nav.value.filter(([, , show]) => show));
+const mobileNavItems = computed(() =>
+  mobileNav.filter((item) => !item.requiresEdit || auth.canEdit)
+);
+const moreSections = computed(() =>
+  moreNavSections({ canEdit: auth.canEdit, isAdmin: auth.isAdmin })
+);
 const isLoginRoute = computed(() => route.name === 'login');
 const userInitials = computed(() =>
   (auth.user?.name || auth.user?.email || 'GE')
@@ -30,6 +40,11 @@ const userInitials = computed(() =>
     .map((part) => part[0]?.toUpperCase())
     .join('')
 );
+
+function isMobileActive(item) {
+  if (item.exact) return route.path === item.to;
+  return route.path === item.to || (item.to !== '/' && route.path.startsWith(item.to));
+}
 
 async function logout() {
   await auth.logout();
@@ -55,7 +70,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="min-h-screen">
+  <ToastHost />
+
+  <div class="min-h-screen min-h-dvh">
     <aside
       v-if="!isLoginRoute"
       class="fixed inset-y-0 left-0 z-20 hidden w-72 border-r border-orange-900/40 bg-black/35 p-5 backdrop-blur-xl lg:block"
@@ -91,37 +108,60 @@ onBeforeUnmount(() => {
       </div>
     </aside>
 
-    <div
-      v-if="!isLoginRoute"
-      class="sticky top-0 z-10 border-b border-orange-900/40 bg-pit/85 px-4 py-3 backdrop-blur lg:hidden"
-    >
-      <div class="mb-3 flex items-center justify-between gap-3">
-        <div>
-          <p class="page-kicker">Savannah BBQ</p>
-          <p class="font-black">Growth Engine</p>
+    <div v-if="!isLoginRoute" class="mobile-content-column flex min-h-screen min-h-dvh flex-col lg:ml-72">
+      <header class="mobile-header safe-top sticky top-0 z-10 border-b border-orange-900/40 bg-pit/85 px-4 py-3 backdrop-blur lg:hidden">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="page-kicker">Savannah BBQ</p>
+            <p class="font-black">Growth Engine</p>
+          </div>
+          <button class="btn-secondary px-3 py-2" @click="logout">Sign out</button>
         </div>
-        <button class="btn-secondary px-3 py-2" @click="logout">Sign out</button>
-      </div>
-      <nav class="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+      </header>
+
+      <main class="mobile-main flex-1 p-4 sm:p-6 lg:p-8">
+        <RouterView />
+      </main>
+
+      <nav
+        class="mobile-tab-bar safe-bottom fixed inset-x-0 bottom-0 z-40 flex border-t border-orange-900/40 bg-pit/95 backdrop-blur lg:hidden"
+        aria-label="Main navigation"
+      >
         <RouterLink
-          v-for="[href, label] in visibleNav"
-          :key="href"
-          :to="href"
-          class="shrink-0 rounded-full border border-orange-900/50 bg-black/20 px-3 py-2 text-xs font-bold text-orange-100/75"
-          active-class="border-orange-500 bg-orange-900/60 text-orange-50"
+          v-for="item in mobileNavItems"
+          :key="item.to"
+          :to="item.to"
+          :title="item.label"
+          :aria-label="item.label"
+          class="mobile-tab flex flex-1 flex-col items-center justify-center gap-0.5 font-medium transition"
+          :class="isMobileActive(item) ? 'bg-orange-900/40 text-orange-100' : 'text-orange-200/55 hover:text-orange-100/80'"
         >
-          {{ label }}
+          <span class="mobile-tab-icon" :class="isMobileActive(item) ? 'text-orange-200' : 'text-orange-300/50'">
+            {{ item.icon }}
+          </span>
+          <span class="mobile-tab-label">{{ item.label }}</span>
         </RouterLink>
+        <button
+          type="button"
+          class="mobile-tab flex flex-1 flex-col items-center justify-center gap-0.5 font-medium text-orange-200/55 transition hover:text-orange-100/80"
+          aria-label="More navigation"
+          @click="showMoreMenu = true"
+        >
+          <span class="mobile-tab-icon text-orange-300/50">☰</span>
+          <span class="mobile-tab-label">More</span>
+        </button>
       </nav>
+
+      <MobileMoreMenu :open="showMoreMenu" :sections="moreSections" @close="showMoreMenu = false" />
     </div>
 
-    <main :class="!isLoginRoute ? 'lg:ml-72' : ''" class="min-h-screen p-4 sm:p-6 lg:p-8">
+    <main v-else class="min-h-screen">
       <RouterView />
     </main>
 
     <div
       v-if="updateAvailable"
-      class="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-xl rounded-3xl border border-orange-700/50 bg-pit/95 p-4 shadow-2xl shadow-black/40 backdrop-blur"
+      class="fixed inset-x-4 bottom-20 z-50 mx-auto max-w-xl rounded-3xl border border-orange-700/50 bg-pit/95 p-4 shadow-2xl shadow-black/40 backdrop-blur lg:bottom-4"
     >
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>

@@ -1,6 +1,9 @@
 <script setup>
 import { reactive, ref } from 'vue';
+import PageHeader from '../components/PageHeader.vue';
+import StatusBanner from '../components/StatusBanner.vue';
 import { http } from '../api/http.js';
+import { useApiRequest } from '../composables/useApiRequest.js';
 
 const tasks = [
   ['campaign', 'Campaign Generator'],
@@ -24,45 +27,45 @@ const form = reactive({
   notes: ''
 });
 const output = ref('');
-const loading = ref(false);
-const notice = ref('');
+const { loading, error, run } = useApiRequest();
 
 async function generate() {
-  loading.value = true;
-  notice.value = '';
-  try {
-    const { data } = await http.post('/ai/generate', {
-      task: form.task,
-      platform: form.platform,
-      tone: form.tone,
-      input: { ...form },
-      save: true
-    });
-    output.value = data.output;
-  } finally {
-    loading.value = false;
-  }
+  const { data } = await run(
+    () =>
+      http.post('/ai/generate', {
+        task: form.task,
+        platform: form.platform,
+        tone: form.tone,
+        input: { ...form },
+        save: true
+      }),
+    { successMessage: 'Campaign copy generated.' }
+  );
+  output.value = data.output;
 }
 
 async function queueOutput() {
-  await http.post('/queue', {
-    platform: form.platform,
-    tone: form.tone,
-    content: output.value,
-    mediaType: 'text'
-  });
-  notice.value = 'Added to queue and ready for scheduling.';
+  await run(
+    () =>
+      http.post('/queue', {
+        platform: form.platform,
+        tone: form.tone,
+        content: output.value,
+        mediaType: 'text'
+      }),
+    { successMessage: 'Added to queue and ready for scheduling.' }
+  );
 }
 </script>
 
 <template>
   <section class="grid gap-6 xl:grid-cols-[430px_1fr]">
     <form class="card space-y-5" @submit.prevent="generate">
-      <div>
-        <p class="page-kicker">Content studio</p>
-        <h1 class="page-title">AI Generator</h1>
-        <p class="page-copy">Create Savannah-ready campaign copy, hooks, replies, promos, and email drafts.</p>
-      </div>
+      <PageHeader
+        kicker="Content studio"
+        title="AI Generator"
+        copy="Create Savannah-ready campaign copy, hooks, replies, promos, and email drafts."
+      />
       <label>
         <span class="label">Task</span>
         <select v-model="form.task" class="input">
@@ -85,11 +88,9 @@ async function queueOutput() {
           <p class="badge">Draft output</p>
           <h2 class="mt-3 text-2xl font-black">Generated copy</h2>
         </div>
-        <button class="btn-secondary" :disabled="!output" @click="queueOutput">Add to queue</button>
+        <button class="btn-secondary" :disabled="!output || loading" @click="queueOutput">Add to queue</button>
       </div>
-      <p v-if="notice" class="mb-4 rounded-2xl border border-green-400/30 bg-green-950/30 px-4 py-3 text-sm text-green-100">
-        {{ notice }}
-      </p>
+      <StatusBanner v-if="error" class="mb-4" tone="error" :message="error" />
       <pre class="min-h-96 flex-1 whitespace-pre-wrap rounded-3xl border border-orange-900/40 bg-black/30 p-5 text-sm leading-6 text-orange-50/90">{{ output || 'Generated copy will appear here after you choose a task and click Generate.' }}</pre>
     </div>
   </section>

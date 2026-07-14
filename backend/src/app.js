@@ -19,7 +19,9 @@ import { integrationRoutes } from './routes/integrationRoutes.js';
 import { logRoutes } from './routes/logRoutes.js';
 import { queueRoutes } from './routes/queueRoutes.js';
 import { schedulerRoutes } from './routes/schedulerRoutes.js';
+import { getHealth } from './controllers/setupController.js';
 import { settingsRoutes } from './routes/settingsRoutes.js';
+import { setupRoutes } from './routes/setupRoutes.js';
 import { userRoutes } from './routes/userRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -39,9 +41,7 @@ export function createApp() {
   app.use(cookieParser());
   app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 600 }));
 
-  app.get('/api/health', (_req, res) => {
-    res.json({ ok: true, service: 'savannah-bbq-growth-engine', time: new Date().toISOString() });
-  });
+  app.get('/api/health', getHealth);
 
   app.use('/api/auth', authRoutes);
   app.use('/api', requireAuth);
@@ -55,6 +55,7 @@ export function createApp() {
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/scheduler', schedulerRoutes);
   app.use('/api/settings', settingsRoutes);
+  app.use('/api/setup', setupRoutes);
 
   const frontendDist = path.resolve(__dirname, '../../frontend/dist');
   app.use(express.static(frontendDist));

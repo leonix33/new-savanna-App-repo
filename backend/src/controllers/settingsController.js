@@ -31,7 +31,13 @@ export const getSocialSetup = asyncHandler(async (_req, res) => {
       autoPublishMode: env.AUTO_PUBLISH_MODE,
       liveFacebookMode: env.LIVE_FACEBOOK_MODE,
       liveSocialPublishing: env.LIVE_SOCIAL_PUBLISHING,
-      writesImplemented: false
+      facebookPublishEnabled: env.FACEBOOK_PUBLISH_ENABLED
+    },
+    writesImplemented: {
+      facebookText: true,
+      instagram: false,
+      tiktok: false,
+      liveCommentReplies: false
     }
   });
 });
